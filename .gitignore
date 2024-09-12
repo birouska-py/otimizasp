@@ -1,0 +1,10 @@
+# Ignorar diretório MinIO
+lab/volumes/minio/
+
+# Ignorar diretórios específicos dentro de Nifi/conf
+lab/volumes/nifi/conf/archive/
+lab/volumes/nifi/content_repository/
+lab/volumes/nifi/database_repository/
+lab/volumes/nifi/flowfile_repository/
+lab/volumes/nifi/provenance_repository/
+lab/volumes/nifi/state/
