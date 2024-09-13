@@ -16,7 +16,7 @@ services:
         - ./volumes/nifi/provenance_repository:/opt/nifi/nifi-current/provenance_repository
         - ./volumes/nifi/state:/opt/nifi/nifi-current/state
         - ./volumes/nifi/conf:/opt/nifi/nifi-current/conf
-        - ./volumes/nifi/conf:/opt/nifi/nifi-current/conf
+        - ./volumes/nifi/logs:/opt/nifi/nifi-current/logs
         - ./volumes/nifi/util/jar:/util/jar
 
       environment:
