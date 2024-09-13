@@ -8,3 +8,4 @@ lab/volumes/nifi/database_repository/
 lab/volumes/nifi/flowfile_repository/
 lab/volumes/nifi/provenance_repository/
 lab/volumes/nifi/state/
+lab/volumes/nifi/logs/
