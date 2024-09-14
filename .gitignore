@@ -9,3 +9,7 @@ lab/volumes/nifi/flowfile_repository/
 lab/volumes/nifi/provenance_repository/
 lab/volumes/nifi/state/
 lab/volumes/nifi/logs/
+
+.venv
+
+notebooks/.ipynb_checkpoints

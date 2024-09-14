@@ -1,41 +1,38 @@
 services:
 
-  # SOURCE
-  # INGESTION
+# INGESTION
+  #NIFI
   nifi:
-      image: apache/nifi:${NIFI_VERSION}
-      container_name: nifi-otmzsp
-      hostname: nifi-otmzsp
-      networks:
+    image: apache/nifi:${NIFI_VERSION}
+    container_name: nifi-otmzsp
+    hostname: nifi-otmzsp
+    networks:
       - otmzsp_network
-      volumes:
-        - ./volumes/nifi/util:/util
-        - ./volumes/nifi/util/jar:/util/jar
-        - ./volumes/nifi/conf:/opt/nifi/nifi-current/conf
-
-      environment:
-        NIFI_WEB_HTTP_PORT: "9090"
-        NIFI_WEB_HTTPS_HOST: "nifi"
-        TZ: "America/Sao_Paulo"
-      command: >
-        sh -c "ln -snf /usr/share/zoneinfo/$$TZ /etc/localtime && echo $$TZ > /etc/timezone"
-      
-      ports:
-        - 49090:9090
-      deploy:
-        resources:
-          limits:
-            memory: 2g
-            #cpus: '0.2'
-
-  #DATA LAKE
+    volumes:
+      - ./volumes/nifi/util:/util
+      - ./volumes/nifi/util/jar:/util/jar
+      - ./volumes/nifi/conf:/opt/nifi/nifi-current/conf
+    environment:
+      NIFI_WEB_HTTP_PORT: "9090"
+      NIFI_WEB_HTTPS_HOST: "nifi"
+      TZ: "America/Sao_Paulo"
+    command: >
+      sh -c "ln -snf /usr/share/zoneinfo/$$TZ /etc/localtime && echo $$TZ > /etc/timezone"
+    ports:
+      - 49090:9090
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+#STORAGE
+  # DATA LAKE
   minio-otmzsp:
     image: minio/minio:${MINIO_VERSION}
     container_name: minio-otmzsp
     networks:
-          - otmzsp_network
+      - otmzsp_network
     entrypoint: sh
-    command:   '-c ''mkdir -p /minio_data/raw && mkdir -p /minio_data/trusted && minio server /minio_data --console-address ":9001"'''
+    command: '-c ''mkdir -p /minio_data/raw && mkdir -p /minio_data/trusted && minio server /minio_data --console-address ":9001"'''
     ports:
       - "49000:9000"
       - "49001:9001"
@@ -51,8 +48,70 @@ services:
       timeout: 5s
       retries: 5
 
+#PROCESS
+  # SPARK MASTER
+  spark-master-otmzsp:
+    image: apache/spark:${SPARK_VERSION}
+    container_name: spark-master-otmzsp
+    networks:
+      - otmzsp_network
+    environment:
+      - SPARK_MODE=master
+      - SPARK_MASTER_HOST=spark-master-otmzsp
+      - SPARK_NO_DAEMONIZE=true
+      - TZ=America/Sao_Paulo
+    ports:
+      - "7077:7077"
+      - "8080:8080"
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+    command: >
+      /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
+
+  # SPARK WORKER
+  spark-worker-otmzsp:
+    image: apache/spark:${SPARK_VERSION}
+    container_name: spark-worker-otmzsp
+    user: root
+    networks:
+      - otmzsp_network
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master-otmzsp:7077
+      - SPARK_WORKER_MEMORY=1g
+      - SPARK_NO_DAEMONIZE=true
+      - TZ=America/Sao_Paulo
+    ports:
+      - "8081:8081"
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+    command: >
+      /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master-otmzsp:7077
+  #JUPYTER
+  jupyter-otmzsp:
+    image: jupyter/pyspark-notebook:latest
+    container_name: jupyter-otmzsp
+    networks:
+      - otmzsp_network
+    ports:
+      - "8888:8888"  # Porta para acessar o Jupyter
+      - 4040:4040
+      - 4041:4041
+      - 4042:4042
+      - 4043:4043
+    environment:
+      JUPYTER_TOKEN: ""  # Desabilita o token
+    volumes:
+      - ../notebooks:/home/jovyan/work  # Para notebooks
+    command: >
+      start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''
+
+#NETWORKS
 networks:
   otmzsp_network:
     name: otmzsp-network
     driver: bridge
-
