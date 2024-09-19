@@ -2,6 +2,7 @@
 lab/volumes/minio/
 lab/volumes/kibana/
 lab/volumes/elasticsearch/
+lab/volumes/postgres/
 
 # Ignorar diretórios específicos dentro de Nifi/conf
 lab/volumes/nifi/conf/archive/
