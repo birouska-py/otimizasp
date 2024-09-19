@@ -140,16 +140,16 @@ services:
        - "-c"
        - "max_wal_senders=4"
        
-  #HIVE
+  #METASTORE
   metastore-otmzsp:
-    image: apache/hive:4.0.0
+    image: apache/hive:${HIVE_VERSION}
     platform: linux/amd64
     container_name: metastore-otmzsp
     networks:
       - otmzsp_network
     environment:
-      AWS_ACCESS_KEY_ID: datalake
-      AWS_SECRET_ACCESS_KEY: datalake
+      AWS_ACCESS_KEY_ID: admin
+      AWS_SECRET_ACCESS_KEY: minioadmin
       HIVE_CUSTOM_CONF_DIR: "/hive_custom_conf"
       SERVICE_NAME: metastore
       HIVE_METASTORE_DB_TYPE: postgres
@@ -168,7 +168,54 @@ services:
     command: ["/bin/bash", "-c", "/opt/hive/bin/schematool -dbType postgres -initSchema; /opt/hive/bin/hive --service metastore"]
     ports:
       - "9083:9083"
+
+  #HIVE 
+  hive-otmzsp:
+    hostname: hive-otmzsp
+    image: apache/hive:${HIVE_VERSION}
+    platform: linux/amd64
+    container_name: hive-otmzsp
+    networks:
+      - otmzsp_network
+    environment:
+      AWS_ACCESS_KEY_ID: admin
+      AWS_SECRET_ACCESS_KEY: minioadmin
+      HIVE_CUSTOM_CONF_DIR: "/hive_custom_conf"
+      SERVICE_NAME: hiveserver2
+      SERVICE_OPTS: "-Dhive.metastore.uris=thrift://metastore-otmzsp:9083" 
+      IS_RESUME: "true"
+    ports:
+       - "10000:10000"
+       - "10002:10002"
+    depends_on:
+      - metastore-otmzsp
+    user: root
+    volumes:
+       - ./volumes/hive/conf:/hive_custom_conf
+       
   #PRESTO
+  presto-otmzsp:
+    platform: linux/amd64
+    image: prestodb/presto:${PRESTO_VERSION}
+    hostname: presto-otmzsp
+    container_name: presto-otmzsp
+    networks:
+      - otmzsp_network
+    volumes: 
+      - ./volumes/presto/etc/catalog:/opt/presto-server/etc/catalog/
+      - ./volumes/presto/etc/catalog:/opt/presto/etc/catalog/
+      - ./volumes/presto/etc/catalog:/etc/catalog/ 
+      #- ./util:/util
+    ports:
+      - 18080:8080
+    depends_on:
+      - hive-otmzsp
+
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+          #cpus: '0.2'
 
 # DATA VIZUALIZATION   
   # elasticsearch   
