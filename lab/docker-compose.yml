@@ -97,7 +97,7 @@ services:
 
   #JUPYTER
   jupyter-otmzsp:
-    image: jupyter/pyspark-notebook:latest
+    image: jupyter/pyspark-notebook:${JUPYTER_VERSION}
     container_name: jupyter-otmzsp
     networks:
       - otmzsp_network
@@ -113,11 +113,69 @@ services:
       - ../notebooks:/home/jovyan/work  # Para notebooks
     command: >
       start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''
+      
+# DATA ACCESS
+  #POSTGRES
+  postgres-otmzsp:
+    container_name: postgres-otmzsp
+    hostname: postgres-otmzsp
+    image: postgres:${POSTGRES_VERSION}
+    networks:
+      - otmzsp_network
+    environment:
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "admin"
+      POSTGRES_DB: metastore
+      PGDATA: "/data/postgres"
+    volumes:
+       - ./volumes/postgres/data:/data/postgres
+    ports:
+      - "5432:5432"
+    command:
+       - "postgres"
+       - "-c"
+       - "wal_level=logical"
+       - "-c"
+       - "max_replication_slots=4"
+       - "-c"
+       - "max_wal_senders=4"
+       
+  #HIVE
+  metastore-otmzsp:
+    image: apache/hive:3.1.3
+    #image: fjardim/mds-hive-metastore
+    platform: linux/amd64
+    container_name: metastore-otmzsp
+    networks:
+      - otmzsp_network
+    environment:
+      AWS_ACCESS_KEY_ID: datalake
+      AWS_SECRET_ACCESS_KEY: datalake
+      HIVE_CUSTOM_CONF_DIR: "/hive_custom_conf"
+      SERVICE_NAME: metastore
+      HIVE_METASTORE_DB_TYPE: postgres
+      HIVE_METASTORE_DB_HOST: postgres-otmzsp
+      HIVE_METASTORE_DB_NAME: metastore
+      HIVE_METASTORE_DB_USER: admin
+      HIVE_METASTORE_DB_PASSWORD: admin
+      DB_DRIVER: postgres 
+      SERVICE_OPTS: "-Djavax.jdo.option.ConnectionDriverName=org.postgresql.Driver -Djavax.jdo.option.ConnectionURL=jdbc:postgresql://postgres-otmzsp:5432/metastore -Djavax.jdo.option.ConnectionUserName=admin -Djavax.jdo.option.ConnectionPassword=admin" 
+    volumes:
+      - ./volumes/hive/meta:/opt/hive/data/warehouse      
+      - ./volumes/hive/conf:/opt/hive/conf
+      - ./volumes/util:/util
+      - ./volumes/hive/util/lib/postgresql-42.7.1.jar:/opt/hive/lib/postgresql-42.7.1.jar
+    depends_on:
+      - postgres-otmzsp
+    command: ["/bin/bash", "-c", "/opt/hive/bin/schematool -dbType postgres -initSchema; /opt/hive/bin/hive --service metastore"]
+    ports:
+      - "9083:9083"
+  #PRESTO
 
-# DATAVIZ   
+# DATA VIZUALIZATION   
   # elasticsearch   
   elasticsearch-otmzsp:
-    image: elasticsearch:7.17.20
+    image: elasticsearch:${ELASTICSEARCH_VERSION}
     container_name: elasticsearch-otmzsp
     hostname: elasticsearch-otmzsp
     ports:
@@ -141,7 +199,7 @@ services:
   
   # Kibana    
   kibana-otmzsp:
-    image: kibana:7.17.20
+    image: kibana:${KIBANA_VERSION}
     container_name: kibana-otmzsp
     hostname: kibana-otmzsp
     ports:
