@@ -17,21 +17,21 @@
 <!-- Put site-specific property overrides in this file. -->
 
 <configuration>
-
+<!--
 <property><name>fs.defaultFS</name><value>hdfs://namenode:8020</value></property>
 <property><name>hadoop.http.staticuser.user</name><value>root</value></property>
 <property><name>io.compression.codecs</name><value>org.apache.hadoop.io.compress.SnappyCodec</value></property>
 <property><name>hadoop.proxyuser.hive.hosts</name><value>*</value></property>
 <property><name>hadoop.proxyuser.hive.groups</name><value>*</value></property>
-
+-->
 <!-- Hive impersonation -->
 <property><name>hadoop.proxyuser.hive.hosts</name><value>*</value></property>
 <property><name>hadoop.proxyuser.hive.groups</name><value>*</value></property>
 <!-- Minio properties -->
 <property><name>fs.s3a.connection.ssl.enabled</name><value>true</value></property>
-<property><name>fs.s3a.endpoint</name><value>http://minio:9000</value></property>
-<property><name>fs.s3a.access.key</name><value>datalake</value></property>
-<property><name>fs.s3a.secret.key</name><value>datalake</value></property>
+<property><name>fs.s3a.endpoint</name><value>http://minio-otmzsp:9000</value></property>
+<property><name>fs.s3a.access.key</name><value>admin</value></property>
+<property><name>fs.s3a.secret.key</name><value>minioadmin</value></property>
 <property><name>fs.s3a.path.style.access</name><value>true</value></property>
 <property><name>fs.s3a.impl</name><value>org.apache.hadoop.fs.s3a.S3AFileSystem</value></property>
 
