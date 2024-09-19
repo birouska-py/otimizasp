@@ -146,6 +146,7 @@ services:
     #image: fjardim/mds-hive-metastore
     platform: linux/amd64
     container_name: metastore-otmzsp
+    user: root
     networks:
       - otmzsp_network
     environment:
