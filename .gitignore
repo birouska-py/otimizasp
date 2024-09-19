@@ -1,5 +1,8 @@
 # Ignorar diretório MinIO
 lab/volumes/minio/
+lab/volumes/kibana/
+lab/volumes/elasticsearch/
+lab/volumes/postgres/
 
 # Ignorar diretórios específicos dentro de Nifi/conf
 lab/volumes/nifi/conf/archive/
@@ -13,3 +16,5 @@ lab/volumes/nifi/logs/
 .venv
 
 notebooks/.ipynb_checkpoints
+
+.DS_Store
