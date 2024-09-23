@@ -68,7 +68,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 2g
+          memory: 3g
     command: >
       /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
 
@@ -92,7 +92,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1g
+          memory: 2g
     command: >
       /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master-otmzsp:7077
 
