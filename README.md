@@ -119,3 +119,43 @@ O arquivo `docker-compose.yml` que está na pasta lab, define diversos serviços
 - Certifique-se de que o serviço Elasticsearch esteja **saudável** antes de iniciar o Kibana.
 
 
+## Análise de Dados
+
+Foram realizadas diversas análises exploratórias e pré-processamentos com os dados disponibilizados durante o desenvolvimento do projeto. Essas análises incluíram a inspeção dos dados, detecção de padrões, e transformações visando a otimização dos fluxos de dados e a preparação para futuras integrações. No entanto, devido às limitações de tempo, não foi possível implementar todas as melhorias e conclusões dessas análises no pipeline atual.
+
+A imagem abaixo, intitulada **percurso_linha.png**, demonstra um exemplo dos ótimos resultados que conseguimos obter, representando o percurso de uma linha de ônibus com estimativas de chegada para cada parada. Esse é um exemplo das análises que ficarão como próximos passos para serem implementadas em um futuro próximo.
+
+<div align="center">
+  <img src="./documentos/analise_dados/percurso_linha.png" alt="Protótipo de percurso">
+</div>
+
+O detalhamento das análises e as etapas realizadas podem ser conferidos no notebook interativo, disponível [neste link](https://colab.research.google.com/drive/1kZ4u6iMPOMT-crjTAy5H9D9HVyINoKzM?usp=sharing#scrollTo=HC1BtS2ruWCN).
+
+
+## Dashboard
+
+O **Dashboard** apresenta uma visão geral das posições dos ônibus em uma área específica, além de informações detalhadas sobre a quantidade de ônibus, padrões de tráfego e acessibilidade.
+
+<div align="center">
+  <img src="./documentos/dashboard/dashboard_picture.png" alt="Dashboard do OtimizaSP">
+</div>
+
+
+### Componentes do Dashboard:
+
+1. **Gráfico de Barras (Posições por Período de 3 horas)**:
+   Exibe a distribuição de posições de ônibus ao longo do tempo, dividida em intervalos de 3 horas. O gráfico mostra a variação do número de posições capturadas, refletindo a intensidade do tráfego de ônibus em diferentes períodos ao longo de vários dias.
+
+2. **Total de Posições**:
+   Um valor destacado no dashboard que informa o **Total de Posições** capturadas, que, neste caso, é 21.774.069. Esse número representa o volume total de registros de posições dos ônibus, acumulados durante o período de monitoramento.
+
+3. **Distribuição de Ônibus por Sentido (Centro/Bairro)**:
+   Este gráfico de pizza ilustra a divisão percentual dos ônibus em movimento, separados pelo sentido da rota (Centro ou Bairro). No exemplo, a proporção está próxima de 53,17% em direção ao **Centro** e 46,83% em direção ao **Bairro**.
+
+4. **Acessibilidade**:
+   Um gráfico de donut que destaca a acessibilidade dos ônibus monitorados. Conforme indicado, 99,91% dos ônibus são **Acessíveis**, enquanto uma pequena fração (0,09%) não o é. Isso reflete a inclusão de veículos com recursos para pessoas com mobilidade reduzida.
+
+5. **Mapa de Calor (Heatmap) da Quantidade de Ônibus por Localização**:
+   O mapa de calor mostra a concentração de ônibus em diferentes regiões, com áreas em vermelho indicando maior densidade de veículos. O mapa facilita a visualização de regiões de maior tráfego, permitindo uma análise espacial da distribuição de ônibus na região metropolitana de São Paulo e cidades próximas, como Santo André, Cotia, e Mogi das Cruzes.
+
+Este **Dashboard** permite uma análise rápida e visual dos dados de tráfego e acessibilidade dos ônibus, fornecendo insights valiosos sobre padrões de movimentação e cobertura.
