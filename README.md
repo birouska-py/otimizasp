@@ -119,3 +119,15 @@ O arquivo `docker-compose.yml` que está na pasta lab, define diversos serviços
 - Certifique-se de que o serviço Elasticsearch esteja **saudável** antes de iniciar o Kibana.
 
 
+## Análise de Dados
+
+Foram realizadas diversas análises exploratórias e pré-processamentos com os dados disponibilizados durante o desenvolvimento do projeto. Essas análises incluíram a inspeção dos dados, detecção de padrões, e transformações visando a otimização dos fluxos de dados e a preparação para futuras integrações. No entanto, devido às limitações de tempo, não foi possível implementar todas as melhorias e conclusões dessas análises no pipeline atual.
+
+O detalhamento das análises e as etapas realizadas podem ser conferidos no notebook interativo, disponível [neste link](https://colab.research.google.com/drive/1kZ4u6iMPOMT-crjTAy5H9D9HVyINoKzM?usp=sharing#scrollTo=HC1BtS2ruWCN).
+
+## Dashboard
+
+Abaixo figura que ilustra a aparência do Dashboard
+<div align="center">
+  <img src="./documentos/dashboard/dashboard_picture.png" alt="Dashboard do OtimizaSP">
+</div>
