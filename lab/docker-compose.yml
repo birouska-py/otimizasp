@@ -68,7 +68,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 2g
+          memory: 3g
     command: >
       /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
 
@@ -88,10 +88,11 @@ services:
       - "8081:8081"
     volumes:
       - ./volumes/spark/util:/util
+      - ./volumes/spark/work:/home/user 
     deploy:
       resources:
         limits:
-          memory: 1g
+          memory: 2g
     command: >
       /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master-otmzsp:7077
 
@@ -114,110 +115,7 @@ services:
     command: >
       start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''
       
-# DATA ACCESS
-  #POSTGRES
-  postgres-otmzsp:
-    container_name: postgres-otmzsp
-    hostname: postgres-otmzsp
-    image: postgres:${POSTGRES_VERSION}
-    networks:
-      - otmzsp_network
-    environment:
-      POSTGRES_USER: "admin"
-      POSTGRES_PASSWORD: "admin"
-      POSTGRES_DB: metastore
-      PGDATA: "/data/postgres"
-    volumes:
-       - ./volumes/postgres/data:/data/postgres
-    ports:
-      - "5432:5432"
-    command:
-       - "postgres"
-       - "-c"
-       - "wal_level=logical"
-       - "-c"
-       - "max_replication_slots=4"
-       - "-c"
-       - "max_wal_senders=4"
-       
-  #METASTORE
-  metastore-otmzsp:
-    image: apache/hive:${HIVE_VERSION}
-    platform: linux/amd64
-    container_name: metastore-otmzsp
-    networks:
-      - otmzsp_network
-    environment:
-      AWS_ACCESS_KEY_ID: admin
-      AWS_SECRET_ACCESS_KEY: minioadmin
-      HIVE_CUSTOM_CONF_DIR: "/hive_custom_conf"
-      SERVICE_NAME: metastore
-      HIVE_METASTORE_DB_TYPE: postgres
-      HIVE_METASTORE_DB_HOST: postgres-otmzsp
-      HIVE_METASTORE_DB_NAME: metastore
-      HIVE_METASTORE_DB_USER: admin
-      HIVE_METASTORE_DB_PASSWORD: admin
-      DB_DRIVER: postgres 
-      SERVICE_OPTS: "-Djavax.jdo.option.ConnectionDriverName=org.postgresql.Driver -Djavax.jdo.option.ConnectionURL=jdbc:postgresql://postgres-otmzsp:5432/metastore -Djavax.jdo.option.ConnectionUserName=admin -Djavax.jdo.option.ConnectionPassword=admin" 
-    volumes:
-      - ./volumes/hive/meta:/opt/hive/data/warehouse      
-      - ./volumes/hive/conf:/opt/hive/conf
-      - ./volumes/hive/util/jar/postgresql-42.7.1.jar:/opt/hive/lib/postgresql-42.7.1.jar
-    depends_on:
-      - postgres-otmzsp
-    command: ["/bin/bash", "-c", "/opt/hive/bin/schematool -dbType postgres -initSchema; /opt/hive/bin/hive --service metastore"]
-    ports:
-      - "9083:9083"
-
-  #HIVE 
-  hive-otmzsp:
-    hostname: hive-otmzsp
-    image: apache/hive:${HIVE_VERSION}
-    platform: linux/amd64
-    container_name: hive-otmzsp
-    networks:
-      - otmzsp_network
-    environment:
-      AWS_ACCESS_KEY_ID: admin
-      AWS_SECRET_ACCESS_KEY: minioadmin
-      HIVE_CUSTOM_CONF_DIR: "/hive_custom_conf"
-      SERVICE_NAME: hiveserver2
-      SERVICE_OPTS: "-Dhive.metastore.uris=thrift://metastore-otmzsp:9083" 
-      IS_RESUME: "true"
-    ports:
-       - "10000:10000"
-       - "10002:10002"
-    depends_on:
-      - metastore-otmzsp
-    user: root
-    volumes:
-       - ./volumes/hive/conf:/hive_custom_conf
-       
-  #PRESTO
-  presto-otmzsp:
-    platform: linux/amd64
-    image: prestodb/presto:${PRESTO_VERSION}
-    hostname: presto-otmzsp
-    container_name: presto-otmzsp
-    networks:
-      - otmzsp_network
-    volumes: 
-      - ./volumes/presto/etc/catalog:/opt/presto-server/etc/catalog/
-      - ./volumes/presto/etc/catalog:/opt/presto/etc/catalog/
-      - ./volumes/presto/etc/catalog:/etc/catalog/ 
-      #- ./util:/util
-    ports:
-      - 18080:8080
-    depends_on:
-      - hive-otmzsp
-
-    deploy:
-      resources:
-        limits:
-          memory: 2g
-          #cpus: '0.2'
-
-# DATA VIZUALIZATION   
+# DATA ACCESS   
   # elasticsearch   
   elasticsearch-otmzsp:
     image: elasticsearch:${ELASTICSEARCH_VERSION}
@@ -241,7 +139,8 @@ services:
       start_period: 20s
       test: curl -sS --fail http://elasticsearch-otmzsp:9200/_cluster/health?wait_for_status=yellow&timeout=0s
       timeout: 5s
-  
+      
+# DATA VIZUALIZATION  
   # Kibana    
   kibana-otmzsp:
     image: kibana:${KIBANA_VERSION}
