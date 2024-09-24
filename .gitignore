@@ -18,3 +18,4 @@ lab/volumes/nifi/logs/
 notebooks/.ipynb_checkpoints
 
 .DS_Store
+lab/volumes/dados_kibana_elastic.zip
